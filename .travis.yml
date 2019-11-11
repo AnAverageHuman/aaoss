@@ -1,0 +1,16 @@
+language: c
+group: travis_latest
+
+os:
+  - linux
+  - osx
+
+compiler:
+  - clang
+  - gcc
+
+notifications:
+  email: false
+
+script:
+  - make
