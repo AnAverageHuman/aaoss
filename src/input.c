@@ -30,7 +30,7 @@ char *get_input() {
 /* split a string on spaces into a command structure
  */
 struct command tokenize(char *string) {
-  struct command ret = {NULL, 0};
+  struct command ret = {NULL, 0, 0};
   char *tmpbuffer = NULL;
   for (;; string = NULL) {
     if ((tmpbuffer = strtok(string, &SPACE)) == NULL) {
