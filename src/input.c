@@ -1,6 +1,7 @@
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "aaoss.h"
 
@@ -24,4 +25,19 @@ char *get_input() {
   }
 
   return input;
+}
+
+/* split a string on spaces into a command structure
+ */
+struct command tokenize(char *string) {
+  struct command ret = {NULL, 0};
+  char *tmpbuffer = NULL;
+  for (;; string = NULL) {
+    if ((tmpbuffer = strtok(string, &SPACE)) == NULL) {
+      return ret;
+    }
+
+    ret.items = realloc(ret.items, sizeof(char *) * ++ret.numitems);
+    ret.items[ret.numitems - 1] = tmpbuffer;
+  }
 }
