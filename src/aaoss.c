@@ -3,7 +3,6 @@
 
 #include "aaoss.h"
 #include "disk.h"
-#include "process.h"
 #include "utilities.h"
 
 bool expect_numargs(struct command *cmd, const size_t expected) {
@@ -20,14 +19,14 @@ bool expect_numargs(struct command *cmd, const size_t expected) {
 
 /* execute a command
  */
-void execute(struct command *to_run) {
+void execute(struct process **pcb, struct command *to_run) {
   char *cmd = (to_run->items)[0];
   if (!strcmp(cmd, "A") && expect_numargs(to_run, 2)) {
     long int priority;
     long int size;
     if ((priority = parseInt(to_run->items[1])) != -1 &&
         (size = parseInt((to_run->items)[2])) != -1) {
-      process_create(priority, size);
+      process_create(pcb, priority, size);
     }
   } else if (!strcmp(cmd, "fork") && expect_numargs(to_run, 0)) {
     process_fork();
@@ -54,12 +53,15 @@ void execute(struct command *to_run) {
 
 int main() {
   char *input;
+  struct process *pcb = NULL;
+
   while ((input = get_input())) {
     struct command to_run = tokenize(input);
-    execute(&to_run);
+    execute(&pcb, &to_run);
 
     free(to_run.items);
     free(input);
   }
+
   return 0;
 }
