@@ -25,7 +25,10 @@ void process_create(struct process **processes, const long int priority,
   }
 }
 
-void process_fork() {}
+void process_fork(struct process **processes) {
+  struct process *parent = *processes;
+  process_create(processes, parent->priority, 0); // TODO: get size of parent
+}
 
 void process_exit() {}
 

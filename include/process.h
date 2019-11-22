@@ -13,7 +13,7 @@ struct process { // it's a linked list
 };
 
 void process_create(struct process **processes, const long int, const long int);
-void process_fork(void);
+void process_fork(struct process **processes);
 void process_exit(void);
 void process_wait(void);
 

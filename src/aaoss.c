@@ -29,7 +29,7 @@ void execute(struct process **pcb, struct command *to_run) {
       process_create(pcb, priority, size);
     }
   } else if (!strcmp(cmd, "fork") && expect_numargs(to_run, 0)) {
-    process_fork();
+    process_fork(pcb);
   } else if (!strcmp(cmd, "exit") && expect_numargs(to_run, 0)) {
     process_exit();
   } else if (!strcmp(cmd, "wait") && expect_numargs(to_run, 0)) {
