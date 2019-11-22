@@ -30,6 +30,12 @@ void process_fork(struct process **processes) {
   process_create(processes, parent->priority, 0); // TODO: get size of parent
 }
 
-void process_exit() {}
+void process_exit(struct process **processes) {
+  if (*processes) {
+    struct process *tmp = *processes;
+    *processes = tmp->next;
+    free(tmp);
+  }
+}
 
 void process_wait() {}

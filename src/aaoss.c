@@ -31,7 +31,7 @@ void execute(struct process **pcb, struct command *to_run) {
   } else if (!strcmp(cmd, "fork") && expect_numargs(to_run, 0)) {
     process_fork(pcb);
   } else if (!strcmp(cmd, "exit") && expect_numargs(to_run, 0)) {
-    process_exit();
+    process_exit(pcb);
   } else if (!strcmp(cmd, "wait") && expect_numargs(to_run, 0)) {
     process_wait();
   } else if (!strcmp(cmd, "d") && expect_numargs(to_run, 2)) {
@@ -61,6 +61,11 @@ int main() {
 
     free(to_run.items);
     free(input);
+  }
+
+  // free processes
+  while (pcb) {
+    process_exit(&pcb);
   }
 
   return 0;
