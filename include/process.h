@@ -17,6 +17,6 @@ void process_fork(struct process **processes);
 void process_exit(struct process **processes);
 void process_wait(void);
 
-void process_show(const struct process *);
+void process_show(const struct process *, const char);
 
 #endif // PROCESS_H

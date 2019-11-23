@@ -45,7 +45,7 @@ void execute(struct process **pcb, struct command *to_run) {
       disk_done(disk);
     }
   } else if (!strcmp(cmd, "S") && expect_numargs(to_run, 1)) {
-    show((to_run->items)[1]);
+    show(pcb, (to_run->items)[1]);
   } else if (!to_run->checked) {
     fprintf(stderr, "Command not recognized.\n");
   }

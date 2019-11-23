@@ -19,7 +19,7 @@ struct command tokenize(char *string);
 bool expect_numargs(struct command *, const size_t);
 void execute(struct process **, struct command *);
 
-void show(const char *);
+void show(const struct process *const *, const char *);
 
 const static char SPACE = ' ';
 
