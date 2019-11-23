@@ -1,5 +1,7 @@
-#include "process.h"
+#include <stdio.h>
+
 #include "aaoss.h"
+#include "process.h"
 
 pid_t nextpid = 1;
 
@@ -39,3 +41,7 @@ void process_exit(struct process **processes) {
 }
 
 void process_wait() {}
+
+void process_show(const struct process *proc) {
+  printf("  %6d %6ld \n", proc->pid, proc->priority);
+}
