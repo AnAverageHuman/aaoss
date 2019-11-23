@@ -26,7 +26,7 @@ void execute(struct process **pcb, struct command *to_run) {
     long int size;
     if ((priority = parseInt(to_run->items[1])) != -1 &&
         (size = parseInt((to_run->items)[2])) != -1) {
-      process_create(pcb, priority, size);
+      process_insert(pcb, process_create(priority, size));
     }
   } else if (!strcmp(cmd, "fork") && expect_numargs(to_run, 0)) {
     process_fork(pcb);

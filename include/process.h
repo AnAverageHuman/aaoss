@@ -13,7 +13,11 @@ struct process { // it's a linked list
   struct process *next;
 };
 
-void process_create(struct process **processes, const long int, const long int);
+struct process *process_create(const long int, const long int);
+void process_destroy(struct process *);
+
+void process_insert(struct process **processes, struct process *);
+
 void process_fork(struct process **processes);
 void process_exit(struct process **processes);
 void process_wait(void);

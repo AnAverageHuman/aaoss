@@ -5,13 +5,18 @@
 
 pid_t nextpid = 1;
 
-void process_create(struct process **processes, const long int priority,
-                    const long int size) {
+struct process *process_create(const long int priority, const long int size) {
   struct process *newproc = malloc(sizeof *newproc);
   newproc->pid = nextpid++;
   newproc->children = NULL;
   newproc->priority = priority;
 
+  return newproc;
+}
+
+void process_destroy(struct process *todestroy) { free(todestroy); }
+
+void process_insert(struct process **processes, struct process *newproc) {
   // using <= : we don't want to preempt processes with same priority
   if (*processes && newproc->priority <= (*processes)->priority) {
     struct process *tmp = *processes;
@@ -38,14 +43,16 @@ void process_create(struct process **processes, const long int priority,
 
 void process_fork(struct process **processes) {
   struct process *parent = *processes;
-  process_create(processes, parent->priority, 0); // TODO: get size of parent
+  struct process *newproc =
+      process_create(parent->priority, 0); // TODO: get size of parent
+  process_insert(processes, newproc);
 }
 
 void process_exit(struct process **processes) {
   if (*processes) {
     struct process *tmp = *processes;
     *processes = tmp->next;
-    free(tmp);
+    process_destroy(tmp);
   }
 }
 
