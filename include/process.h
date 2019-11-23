@@ -9,6 +9,7 @@ struct process { // it's a linked list
   pid_t pid;
   pid_t *children;
   long int priority;
+  struct process *prev;
   struct process *next;
 };
 

@@ -19,9 +19,18 @@ void process_create(struct process **processes, const long int priority,
       tmp = tmp->next;
     }
 
+    if (tmp->next) {
+      tmp->next->prev = newproc;
+    }
+
     newproc->next = tmp->next;
+    newproc->prev = tmp;
     tmp->next = newproc;
   } else { // no running processes, or new one has largest priority
+    if (*processes) {
+      (*processes)->prev = newproc;
+    }
+
     newproc->next = *processes;
     *processes = newproc;
   }
