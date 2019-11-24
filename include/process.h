@@ -11,6 +11,7 @@ struct process { // it's a linked list
   long int priority;
   struct process *prev;
   struct process *next;
+  char *filename;
 };
 
 struct process *process_create(const long int, const long int);

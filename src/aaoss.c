@@ -54,6 +54,8 @@ void execute(struct process **pcb, struct command *to_run) {
 int main() {
   char *input;
   struct process *pcb = NULL;
+  size_t numdisks = 10;
+  struct disk *disks = disks_create(numdisks); // TODO: ask for value at startup
 
   while ((input = get_input())) {
     struct command to_run = tokenize(input);
@@ -67,6 +69,9 @@ int main() {
   while (pcb) {
     process_exit(&pcb);
   }
+
+  // free disks
+  disks_destroy(disks, numdisks);
 
   return 0;
 }
