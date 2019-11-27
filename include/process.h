@@ -18,6 +18,7 @@ struct process *process_create(const long int, const long int);
 void process_destroy(struct process *);
 
 void process_insert(struct process **processes, struct process *);
+struct process *process_dequeue(struct process **processes);
 
 void process_fork(struct process **processes);
 void process_exit(struct process **processes);
