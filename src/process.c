@@ -41,6 +41,16 @@ void process_insert(struct process **processes, struct process *newproc) {
   }
 }
 
+struct process *process_dequeue(struct process **processes) {
+  struct process *tmp = *processes;
+  if (tmp) {
+    *processes = tmp->next;
+    tmp->next = tmp->prev = NULL;
+  }
+
+  return tmp;
+}
+
 void process_fork(struct process **processes) {
   struct process *parent = *processes;
   struct process *newproc =
@@ -49,11 +59,7 @@ void process_fork(struct process **processes) {
 }
 
 void process_exit(struct process **processes) {
-  if (*processes) {
-    struct process *tmp = *processes;
-    *processes = tmp->next;
-    process_destroy(tmp);
-  }
+  process_destroy(process_dequeue(processes));
 }
 
 void process_wait() {}
