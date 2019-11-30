@@ -43,7 +43,7 @@ void execute(struct process **pcb, struct process **disks,
   } else if (!strcmp(cmd, "D") && expect_numargs(to_run, 1)) {
     long int disk;
     if ((disk = parseInt((to_run->items)[1])) != -1) {
-      disk_done(disk);
+      disk_done(pcb, disks, disk);
     }
   } else if (!strcmp(cmd, "S") && expect_numargs(to_run, 1)) {
     show(pcb, (to_run->items)[1]);
