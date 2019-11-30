@@ -17,7 +17,7 @@ char *get_input(void);
 struct command tokenize(char *string);
 
 bool expect_numargs(struct command *, const size_t);
-void execute(struct process **, struct command *);
+void execute(struct process **, struct process **, struct command *);
 
 void show(const struct process *const *, const char *);
 

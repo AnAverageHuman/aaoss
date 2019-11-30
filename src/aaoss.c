@@ -19,7 +19,8 @@ bool expect_numargs(struct command *cmd, const size_t expected) {
 
 /* execute a command
  */
-void execute(struct process **pcb, struct command *to_run) {
+void execute(struct process **pcb, struct process **disks,
+             struct command *to_run) {
   char *cmd = (to_run->items)[0];
   if (!strcmp(cmd, "A") && expect_numargs(to_run, 2)) {
     long int priority;
@@ -37,7 +38,7 @@ void execute(struct process **pcb, struct command *to_run) {
   } else if (!strcmp(cmd, "d") && expect_numargs(to_run, 2)) {
     long int disk;
     if ((disk = parseInt((to_run->items)[1])) != -1) {
-      disk_request(disk, (to_run->items)[2]);
+      disk_request(pcb, disks, disk, (to_run->items)[2]);
     }
   } else if (!strcmp(cmd, "D") && expect_numargs(to_run, 1)) {
     long int disk;
@@ -55,11 +56,11 @@ int main() {
   char *input;
   struct process *pcb = NULL;
   size_t numdisks = 10;
-  struct disk *disks = disks_create(numdisks); // TODO: ask for value at startup
+  struct process **disks = disks_create(numdisks); // TODO: ask for value
 
   while ((input = get_input())) {
     struct command to_run = tokenize(input);
-    execute(&pcb, &to_run);
+    execute(&pcb, disks, &to_run);
 
     free(to_run.items);
     free(input);
