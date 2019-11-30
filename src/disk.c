@@ -44,4 +44,9 @@ void disk_request(struct process **pcb, struct process **disks, long int disk,
   proc->prev = tmp;
 }
 
-void disk_done(long int disk) {}
+void disk_done(struct process **pcb, struct process **disks, long int disk) {
+  struct process *proc = process_dequeue(&disks[disk]);
+  if (proc) {
+    process_insert(pcb, proc);
+  }
+}
