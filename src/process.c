@@ -10,11 +10,15 @@ struct process *process_create(const long int priority, const long int size) {
   newproc->pid = nextpid++;
   newproc->children = NULL;
   newproc->priority = priority;
+  newproc->filename = NULL;
 
   return newproc;
 }
 
-void process_destroy(struct process *todestroy) { free(todestroy); }
+void process_destroy(struct process *todestroy) {
+  free(todestroy->filename);
+  free(todestroy);
+}
 
 void process_insert(struct process **processes, struct process *newproc) {
   // using <= : we don't want to preempt processes with same priority
