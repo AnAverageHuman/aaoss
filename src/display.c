@@ -1,6 +1,7 @@
 #include <stdio.h>
 
 #include "aaoss.h"
+#include "disk.h"
 
 static void show_die(const char *op) {
   fprintf(stderr, "Unknown argument %s to S command.\n", op);
@@ -17,7 +18,15 @@ static void show_processes(const struct process *const *pcb) {
   }
 }
 
-void show(const struct process *const *pcb, const char *op) {
+static void show_disks(const struct process *const *disks, const size_t ndisk) {
+  printf("  %6s %2c %2s\n", "PID", 'S', "NAME");
+  for (size_t i = 0; i < ndisk; i++) {
+    disk_show(disks[i], i);
+  }
+}
+
+void show(const struct process *const *pcb, const struct process *const *disks,
+          const size_t numdisks, const char *op) {
   if (op[1]) { // more than one character argument, abort
     show_die(op);
     return;
@@ -28,6 +37,7 @@ void show(const struct process *const *pcb, const char *op) {
     show_processes(pcb);
     break;
   case 'i':
+    show_disks(disks, numdisks);
     break;
   case 'm':
     break;

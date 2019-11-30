@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -46,5 +47,14 @@ void disk_done(struct process **pcb, struct process **disks, long int disk) {
   struct process *proc = process_dequeue(&disks[disk]);
   if (proc) {
     process_insert(pcb, proc);
+  }
+}
+
+void disk_show(const struct process *disk, const size_t disknum) {
+  if (disk) {
+    printf("Disk %lu:\n", disknum);
+    for (struct process *tmp = disk; tmp; tmp = tmp->next) {
+      printf("  %6d %2c %2s\n", tmp->pid, 'D', tmp->filename);
+    }
   }
 }

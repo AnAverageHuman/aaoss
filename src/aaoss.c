@@ -20,7 +20,7 @@ bool expect_numargs(struct command *cmd, const size_t expected) {
 /* execute a command
  */
 void execute(struct process **pcb, struct process **disks,
-             struct command *to_run) {
+             const size_t numdisks, struct command *to_run) {
   char *cmd = (to_run->items)[0];
   if (!strcmp(cmd, "A") && expect_numargs(to_run, 2)) {
     long int priority;
@@ -46,7 +46,7 @@ void execute(struct process **pcb, struct process **disks,
       disk_done(pcb, disks, disk);
     }
   } else if (!strcmp(cmd, "S") && expect_numargs(to_run, 1)) {
-    show(pcb, (to_run->items)[1]);
+    show(pcb, disks, numdisks, (to_run->items)[1]);
   } else if (!to_run->checked) {
     fprintf(stderr, "Command not recognized.\n");
   }
@@ -60,7 +60,7 @@ int main() {
 
   while ((input = get_input())) {
     struct command to_run = tokenize(input);
-    execute(&pcb, disks, &to_run);
+    execute(&pcb, disks, numdisks, &to_run);
 
     free(to_run.items);
     free(input);
