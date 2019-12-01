@@ -14,3 +14,32 @@ struct memslab *memory_create(const size_t maxsize) {
 }
 
 void memory_destroy(struct memslab *todestroy) { free(todestroy); }
+
+/* insert a new memslab into our linked list using worst fit strategy
+ */
+struct memslab *memory_insert(struct memslab *memory, const size_t limit) {
+  struct memslab *candidate = NULL;
+  size_t maxhole = 0;
+
+  for (struct memslab *tmp = memory; tmp->next; tmp = tmp->next) {
+    size_t newhole = tmp->next->base - tmp->base - tmp->limit;
+
+    if (newhole > limit && newhole > maxhole) {
+      candidate = tmp;
+      maxhole = newhole;
+    }
+  }
+
+  if (candidate) {
+    struct memslab *newmem = malloc(sizeof *newmem);
+    newmem->next = candidate->next;
+    candidate->next->prev = newmem;
+    newmem->prev = candidate;
+    candidate->next = newmem;
+    newmem->base = candidate->base + candidate->limit; // left align
+    newmem->limit = limit;
+    return newmem;
+  }
+
+  return NULL;
+}
