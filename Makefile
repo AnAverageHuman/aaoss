@@ -5,8 +5,8 @@ CLEANTARGETS := $(OBJDIR) $(EXECUTABLE)
 SRCDIR := src
 INCDIR := include
 
-SRC := $(filter-out $(EXECUTABLE:%=$(SRCDIR)/%.c),$(wildcard $(SRCDIR)/*.c))
-OBJ := $(patsubst $(SRCDIR)/%.c,$(OBJDIR)/%.o,$(SRC))
+SRC := $(wildcard $(SRCDIR)/*.c)
+OBJ := $(SRC:$(SRCDIR)/%.c=%.o) lex.lex.o parse.tab.o
 
 LDLIBS := -lstdc++
 #XXX LDFLAGS ?= -Wl,-O1 -Wl,--as-needed
@@ -22,10 +22,10 @@ else
 	CFLAGS ?= -O2 -march=native -pipe
 endif
 
-override CFLAGS += -I $(INCDIR) -MMD -MP -MF $(OBJDIR)/$*.d -std=c11
+override CFLAGS += -I $(INCDIR) -MMD -MP -MF $(OBJDIR)/$(notdir $*).d -std=c11
 
 # near-magic echo taken from Linux's Makefile
-# echo all commands if $V is set, replacing echo commands with "true"
+# echo all commands if $V is set
 ifeq ($(V),)
 	quiet := quiet_
 endif
@@ -76,7 +76,7 @@ run: all	## run the executable
 quiet_cmd_link_o_target = LD		$@
 cmd_link_o_target = $(LINK.c) $^ $(LOADLIBES) $(LDLIBS) -o $@
 
-$(EXECUTABLE): % : $(OBJ) $(OBJDIR)/%.o
+$(EXECUTABLE): % : $(addprefix $(OBJDIR)/,$(OBJ)) $(OBJDIR)/%.o
 	$(call cmd,link_o_target)
 
 quiet_cmd_cc_o_c = CC		$@
@@ -85,4 +85,22 @@ cmd_cc_o_c = $(COMPILE.c) $(OUTPUT_OPTION) $<
 $(OBJDIR)/%.o: $(SRCDIR)/%.c | $(OBJDIR)
 	$(call cmd,cc_o_c)
 
-include $(wildcard $(patsubst %,$(OBJDIR)/%.d,$(basename $(SRC))))
+%.o: %.c | $(OBJDIR)
+	$(call cmd,cc_o_c)
+
+quiet_cmd_bison = YACC		$(basename $@).[ch]
+cmd_bison = $(YACC) -o $(basename $@).c --defines=$(basename $@).h -l $<
+
+$(OBJDIR)/%.tab.c $(OBJDIR)/%.tab.h: $(SRCDIR)/%.y | $(OBJDIR)
+	$(call cmd,bison)
+
+quiet_cmd_flex = LEX		$@
+cmd_flex = $(LEX.l) $< > $@
+
+$(OBJDIR)/%.lex.c: $(SRCDIR)/%.l | $(OBJDIR)
+	$(call cmd,flex)
+
+# dependencies on generated files need to be listed explicitly
+$(OBJDIR)/lex.lex.o: $(OBJDIR)/parse.tab.h
+
+-include $(OBJDIR)/$(SRC:$(SRCDIR)/%.c=%.d)
