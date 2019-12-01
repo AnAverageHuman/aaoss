@@ -47,7 +47,7 @@ void execute(struct process **pcb, struct memslab *memory,
       disk_done(pcb, disks, disk);
     }
   } else if (!strcmp(cmd, "S") && expect_numargs(to_run, 1)) {
-    show(pcb, disks, numdisks, (to_run->items)[1]);
+    show(pcb, memory, disks, numdisks, (to_run->items)[1]);
   } else if (!to_run->checked) {
     fprintf(stderr, "Command not recognized.\n");
   }

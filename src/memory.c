@@ -1,3 +1,5 @@
+#include <stdio.h>
+
 #include "memory.h"
 
 struct memslab *memory_create(const size_t maxsize) {
@@ -52,4 +54,9 @@ struct memslab *memory_insert(struct memslab *memory, const size_t limit) {
   }
 
   return NULL;
+}
+
+void memory_show(const struct memslab *ms) {
+  size_t memend = ms->base + ms->limit - 1;
+  printf("  %11lu %11lu\n", ms->base, memend);
 }
