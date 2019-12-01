@@ -5,17 +5,20 @@
 
 pid_t nextpid = 1;
 
-struct process *process_create(const long int priority, const long int size) {
+struct process *process_create(struct memslab *memory, const long int priority,
+                               const size_t size) {
   struct process *newproc = malloc(sizeof *newproc);
   newproc->pid = nextpid++;
   newproc->children = NULL;
   newproc->priority = priority;
   newproc->filename = NULL;
+  newproc->memory = memory_insert(memory, size);
 
   return newproc;
 }
 
 void process_destroy(struct process *todestroy) {
+  memory_destroy(todestroy->memory);
   free(todestroy->filename);
   free(todestroy);
 }
@@ -55,11 +58,13 @@ struct process *process_dequeue(struct process **processes) {
   return tmp;
 }
 
-void process_fork(struct process **processes) {
-  struct process *parent = *processes;
-  struct process *newproc =
-      process_create(parent->priority, 0); // TODO: get size of parent
-  process_insert(processes, newproc);
+void process_fork(struct process **processes, struct memslab *memory) {
+  if (*processes) {
+    struct process *parent = *processes;
+    struct process *newproc =
+        process_create(memory, parent->priority, parent->memory->limit);
+    process_insert(processes, newproc);
+  }
 }
 
 void process_exit(struct process **processes) {

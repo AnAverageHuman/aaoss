@@ -19,18 +19,19 @@ bool expect_numargs(struct command *cmd, const size_t expected) {
 
 /* execute a command
  */
-void execute(struct process **pcb, struct process **disks,
-             const size_t numdisks, struct command *to_run) {
+void execute(struct process **pcb, struct memslab *memory,
+             struct process **disks, const size_t numdisks,
+             struct command *to_run) {
   char *cmd = (to_run->items)[0];
   if (!strcmp(cmd, "A") && expect_numargs(to_run, 2)) {
     long int priority;
     long int size;
     if ((priority = parseInt(to_run->items[1])) != -1 &&
         (size = parseInt((to_run->items)[2])) != -1) {
-      process_insert(pcb, process_create(priority, size));
+      process_insert(pcb, process_create(memory, priority, size));
     }
   } else if (!strcmp(cmd, "fork") && expect_numargs(to_run, 0)) {
-    process_fork(pcb);
+    process_fork(pcb, memory);
   } else if (!strcmp(cmd, "exit") && expect_numargs(to_run, 0)) {
     process_exit(pcb);
   } else if (!strcmp(cmd, "wait") && expect_numargs(to_run, 0)) {
@@ -57,10 +58,12 @@ int main() {
   struct process *pcb = NULL;
   size_t numdisks = 10;
   struct process **disks = disks_create(numdisks); // TODO: ask for value
+  size_t memsize = 100000;
+  struct memslab *memory = memory_create(memsize); // TODO: ask for value
 
   while ((input = get_input())) {
     struct command to_run = tokenize(input);
-    execute(&pcb, disks, numdisks, &to_run);
+    execute(&pcb, memory, disks, numdisks, &to_run);
 
     free(to_run.items);
     free(input);
@@ -73,6 +76,10 @@ int main() {
 
   // free disks
   disks_destroy(disks, numdisks);
+
+  // free memory
+  memory_destroy(memory->next);
+  memory_destroy(memory);
 
   return 0;
 }

@@ -13,7 +13,17 @@ struct memslab *memory_create(const size_t maxsize) {
   return ret;
 }
 
-void memory_destroy(struct memslab *todestroy) { free(todestroy); }
+void memory_destroy(struct memslab *todestroy) {
+  if (todestroy && todestroy->prev) {
+    todestroy->prev->next = todestroy->next;
+  }
+
+  if (todestroy && todestroy->next) {
+    todestroy->next->prev = todestroy->prev;
+  }
+
+  free(todestroy);
+}
 
 /* insert a new memslab into our linked list using worst fit strategy
  */
