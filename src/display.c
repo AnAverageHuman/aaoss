@@ -28,16 +28,15 @@ static void show_memory(const struct memslab *memory) {
   }
 }
 
-static void show_disks(const struct process *const *disks, const size_t ndisk) {
+static void show_disks(const struct disks *disks) {
   printf("  %6s %2c %2s\n", "PID", 'S', "NAME");
-  for (size_t i = 0; i < ndisk; i++) {
-    disk_show(disks[i], i);
+  for (size_t i = 0; i < disks->numdisks; i++) {
+    disk_show(disks->queues[i], i);
   }
 }
 
 void show(const struct process *const *pcb, const struct memslab *memory,
-          const struct process *const *disks, const size_t numdisks,
-          const char *op) {
+          const struct disks *disks, const char *op) {
   if (op[1]) { // more than one character argument, abort
     show_die(op);
     return;
@@ -48,7 +47,7 @@ void show(const struct process *const *pcb, const struct memslab *memory,
     show_processes(pcb);
     break;
   case 'i':
-    show_disks(disks, numdisks);
+    show_disks(disks);
     break;
   case 'm':
     show_memory(memory);

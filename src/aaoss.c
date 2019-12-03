@@ -19,8 +19,7 @@ bool expect_numargs(struct command *cmd, const size_t expected) {
 
 /* execute a command
  */
-void execute(struct process **pcb, struct memslab *memory,
-             struct process **disks, const size_t numdisks,
+void execute(struct process **pcb, struct memslab *memory, struct disks *disks,
              struct command *to_run) {
   char *cmd = (to_run->items)[0];
   if (!strcmp(cmd, "A") && expect_numargs(to_run, 2)) {
@@ -47,7 +46,7 @@ void execute(struct process **pcb, struct memslab *memory,
       disk_done(pcb, disks, disk);
     }
   } else if (!strcmp(cmd, "S") && expect_numargs(to_run, 1)) {
-    show(pcb, memory, disks, numdisks, (to_run->items)[1]);
+    show(pcb, memory, disks, (to_run->items)[1]);
   } else if (!to_run->checked) {
     fprintf(stderr, "Command not recognized.\n");
   }
@@ -57,13 +56,13 @@ int main() {
   char *input;
   struct process *pcb = NULL;
   size_t numdisks = 10;
-  struct process **disks = disks_create(numdisks); // TODO: ask for value
+  struct disks *disks = disks_create(numdisks); // TODO: ask for value
   size_t memsize = 100000;
   struct memslab *memory = memory_create(memsize); // TODO: ask for value
 
   while ((input = get_input())) {
     struct command to_run = tokenize(input);
-    execute(&pcb, memory, disks, numdisks, &to_run);
+    execute(&pcb, memory, disks, &to_run);
 
     free(to_run.items);
     free(input);
@@ -75,7 +74,7 @@ int main() {
   }
 
   // free disks
-  disks_destroy(disks, numdisks);
+  disks_destroy(disks);
 
   // free memory
   memory_destroy(memory->next);
