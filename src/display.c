@@ -7,12 +7,12 @@ static void show_die(const char *op) {
   fprintf(stderr, "Unknown argument %s to S command.\n", op);
 }
 
-static void show_processes(const struct process *const *pcb) {
-  if (*pcb) {
+static void show_processes(const struct process *pcb) {
+  if (pcb->next) {
     printf("  %6s %6s %2c\n", "PID", "PR", 'S');
-    process_show(*pcb, 'R');
+    process_show(pcb->next, 'R');
 
-    for (struct process *it = (*pcb)->next; it; it = it->next) {
+    for (struct process *it = pcb->next->next; it; it = it->next) {
       process_show(it, 'S');
     }
   }
@@ -35,7 +35,7 @@ static void show_disks(const struct disks *disks) {
   }
 }
 
-void show(const struct process *const *pcb, const struct memslab *memory,
+void show(const struct process *pcb, const struct memslab *memory,
           const struct disks *disks, const char *op) {
   if (op[1]) { // more than one character argument, abort
     show_die(op);

@@ -5,15 +5,23 @@
 
 pid_t nextpid = 1;
 
-struct process *process_create(struct memslab *memory, const long int priority,
-                               const size_t size) {
-  struct process *newproc = malloc(sizeof *newproc);
-  newproc->pid = nextpid++;
-  newproc->children = NULL;
-  newproc->priority = priority;
-  newproc->filename = NULL;
-  newproc->memory = memory_insert(memory, size);
+struct process *process_new(struct memslab *memory, const long int priority,
+                            const size_t size) {
+  struct memslab *newmem = memory_insert(memory, size);
+  if (!newmem) { // failed to allocate fake memory
+    return NULL;
+  }
 
+  struct process *newproc = calloc(1, sizeof *newproc);
+  newproc->pid = nextpid++;
+  newproc->priority = priority;
+  newproc->memory = newmem;
+
+  return newproc;
+}
+
+struct process *process_create() {
+  struct process *newproc = calloc(1, sizeof *newproc);
   return newproc;
 }
 
@@ -23,52 +31,53 @@ void process_destroy(struct process *todestroy) {
   free(todestroy);
 }
 
-void process_insert(struct process **processes, struct process *newproc) {
+void process_insert(struct process *processes, struct process *newproc) {
+  if (!newproc) {
+    return;
+  }
+
+  struct process *tmp = processes;
   // using <= : we don't want to preempt processes with same priority
-  if (*processes && newproc->priority <= (*processes)->priority) {
-    struct process *tmp = *processes;
-    while (tmp->next && newproc->priority <= tmp->next->priority) {
-      tmp = tmp->next;
-    }
-
-    if (tmp->next) {
-      tmp->next->prev = newproc;
-    }
-
-    newproc->next = tmp->next;
-    newproc->prev = tmp;
-    tmp->next = newproc;
-  } else { // no running processes, or new one has largest priority
-    if (*processes) {
-      (*processes)->prev = newproc;
-    }
-
-    newproc->next = *processes;
-    *processes = newproc;
-  }
-}
-
-struct process *process_dequeue(struct process **processes) {
-  struct process *tmp = *processes;
-  if (tmp) {
-    *processes = tmp->next;
-    tmp->next = tmp->prev = NULL;
+  while (tmp->next && newproc->priority <= tmp->next->priority) {
+    tmp = tmp->next;
   }
 
-  return tmp;
+  if (tmp->next) {
+    tmp->next->prev = newproc;
+  }
+
+  newproc->next = tmp->next;
+  newproc->prev = tmp;
+  tmp->next = newproc;
 }
 
-void process_fork(struct process **processes, struct memslab *memory) {
-  if (*processes) {
-    struct process *parent = *processes;
+void process_remove(struct process *process) {
+  if (process && process->prev) {
+    process->prev->next = process->next;
+  }
+
+  if (process && process->next) {
+    process->next->prev = process->prev;
+  }
+
+  process->next = process->prev = NULL;
+}
+
+void process_fork(struct process *processes, struct memslab *memory) {
+  struct process *parent = processes->next;
+  if (parent) {
     struct process *newproc =
-        process_create(memory, parent->priority, parent->memory->limit);
+        process_new(memory, parent->priority, parent->memory->limit);
     process_insert(processes, newproc);
   }
 }
 
-void process_exit(struct process **processes) {
-  process_destroy(process_dequeue(processes));
+void process_exit(struct process *processes) {
+  struct process *todestroy = processes->next;
+  if (todestroy) {
+    process_remove(todestroy);
+    process_destroy(todestroy);
+  }
 }
 
 void process_wait() {}

@@ -18,11 +18,11 @@ char *get_input(void);
 struct command tokenize(char *string);
 
 bool expect_numargs(struct command *, const size_t);
-void execute(struct process **, struct memslab *, struct disks *,
+void execute(struct process *, struct memslab *, struct disks *,
              struct command *);
 
-void show(const struct process *const *, const struct memslab *,
-          const struct disks *, const char *);
+void show(const struct process *, const struct memslab *, const struct disks *,
+          const char *);
 
 const static char SPACE = ' ';
 
