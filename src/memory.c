@@ -57,6 +57,6 @@ struct memslab *memory_insert(struct memslab *memory, const size_t limit) {
 }
 
 void memory_show(const struct memslab *ms) {
-  size_t memend = ms->base + ms->limit - 1;
+  size_t memend = ms->base + (ms->limit ? ms->limit - 1 : 0);
   printf("  %11lu %11lu\n", ms->base, memend);
 }
