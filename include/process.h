@@ -7,9 +7,18 @@
 
 extern pid_t nextpid;
 
+struct family {
+  struct process *parent;
+  size_t childidx; // where we are in the parent children array
+  struct process **kids;
+  size_t numkids;
+  struct process **dead;
+  size_t numdead;
+};
+
 struct process { // it's a linked list
   pid_t pid;
-  pid_t *children;
+  struct family family;
   long int priority;
   struct process *prev;
   struct process *next;

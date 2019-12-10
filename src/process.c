@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 
 #include "aaoss.h"
 #include "process.h"
@@ -16,6 +17,7 @@ struct process *process_new(struct memslab *memory, const long int priority,
   newproc->pid = nextpid++;
   newproc->priority = priority;
   newproc->memory = newmem;
+  memset(&(newproc->family), 0, sizeof newproc->family);
 
   return newproc;
 }
@@ -26,7 +28,13 @@ struct process *process_create() {
 }
 
 void process_destroy(struct process *todestroy) {
+  if (todestroy->family.parent) {
+    todestroy->family.parent->family.numdead--;
+  }
+
   memory_destroy(todestroy->memory);
+  free(todestroy->family.kids);
+  free(todestroy->family.dead);
   free(todestroy->filename);
   free(todestroy);
 }
@@ -68,15 +76,40 @@ void process_fork(struct process *processes, struct memslab *memory) {
   if (parent) {
     struct process *newproc =
         process_new(memory, parent->priority, parent->memory->limit);
-    process_insert(processes, newproc);
+    if (newproc) {
+      process_insert(processes, newproc);
+      newproc->family.parent = parent;
+      newproc->family.childidx = parent->family.numkids;
+
+      struct family *f = &(parent->family);
+      f->kids = realloc(f->kids, sizeof *(f->kids) * ++(f->numkids));
+      f->kids[f->numkids - 1] = newproc;
+    }
   }
 }
 
-void process_exit(struct process *processes) {
-  struct process *todestroy = processes->next;
-  if (todestroy) {
-    process_remove(todestroy);
-    process_destroy(todestroy);
+/* process_exit terminates the process, implementing cascading termination
+ */
+void process_exit(struct process *process) {
+  if (process) {
+    memory_destroy(process->memory); // immediately free fake memory
+    process->memory = NULL;
+    process_remove(process);
+
+    struct family *f = &(process->family);
+    while (process->family.numkids) {
+      process_exit(f->kids[f->numkids - 1]);    // request exit
+      process_destroy(f->dead[f->numdead - 1]); // TODO: use wait
+    }
+
+    if (f->parent) { // remove from kids, add to dead
+      struct family *pf = &(f->parent->family);
+      pf->kids[f->childidx] = pf->kids[--(pf->numkids)]; // no point in shrink
+      pf->dead = realloc(pf->dead, sizeof *(pf->dead) * ++(pf->numdead));
+      pf->dead[pf->numdead - 1] = process;
+    } else {
+      process_destroy(process);
+    }
   }
 }
 
