@@ -20,7 +20,7 @@ static void show_processes(const struct process *pcb) {
 
 static void show_memory(const struct memslab *memory) {
   if (memory) {
-    printf("  %11s %11s\n", "MSTART", "MEND");
+    printf("  %11s %11s %6s\n", "MSTART", "MEND", "PID");
     // skip first and last boundary slabs
     for (struct memslab *tmp = memory->next; tmp->next; tmp = tmp->next) {
       memory_show(tmp);

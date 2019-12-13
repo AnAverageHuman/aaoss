@@ -1,6 +1,7 @@
 #include <stdio.h>
 
 #include "memory.h"
+#include "process.h"
 
 struct memslab *memory_create(const size_t maxsize) {
   struct memslab *ret = malloc(sizeof *ret);
@@ -58,5 +59,5 @@ struct memslab *memory_insert(struct memslab *memory, const size_t limit) {
 
 void memory_show(const struct memslab *ms) {
   size_t memend = ms->base + (ms->limit ? ms->limit - 1 : 0);
-  printf("  %11lu %11lu\n", ms->base, memend);
+  printf("  %11lu %11lu %6d\n", ms->base, memend, ms->proc->pid);
 }

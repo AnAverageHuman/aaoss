@@ -17,6 +17,7 @@ struct process *process_new(struct memslab *memory, const long int priority,
   newproc->pid = nextpid++;
   newproc->priority = priority;
   newproc->memory = newmem;
+  newmem->proc = newproc;
   memset(&(newproc->family), 0, sizeof newproc->family);
 
   return newproc;

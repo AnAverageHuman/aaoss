@@ -8,6 +8,7 @@ struct memslab { // it's a linked list
   size_t limit;
   struct memslab *prev;
   struct memslab *next;
+  struct process *proc;
 };
 
 struct memslab *memory_create(const size_t);
