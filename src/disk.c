@@ -15,10 +15,10 @@ struct disks *disks_create(const size_t numdisks) {
   return disks;
 }
 
-void disks_destroy(struct disks *disks) {
+void disks_destroy(struct process *processes, struct disks *disks) {
   for (size_t i = 0; i < disks->numdisks; i++) {
     while (disks->queues[i]->next) {
-      process_exit(disks->queues[i]->next);
+      process_exit(processes, disks->queues[i]->next);
     }
 
     process_destroy(disks->queues[i]);

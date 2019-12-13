@@ -1,6 +1,7 @@
 #ifndef PROCESS_H
 #define PROCESS_H
 
+#include <stdbool.h>
 #include <sys/types.h>
 
 #include "memory.h"
@@ -14,6 +15,7 @@ struct family {
   size_t numkids;
   struct process **dead;
   size_t numdead;
+  bool waiting;
 };
 
 struct process { // it's a linked list
@@ -34,8 +36,8 @@ void process_insert(struct process *, struct process *);
 void process_remove(struct process *);
 
 void process_fork(struct process *processes, struct memslab *);
-void process_exit(struct process *processes);
-void process_wait(void);
+void process_exit(struct process *, struct process *);
+bool process_wait(struct process *);
 
 void process_show(const struct process *, const char);
 

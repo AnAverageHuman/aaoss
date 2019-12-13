@@ -28,10 +28,6 @@ struct process *process_create() {
 }
 
 void process_destroy(struct process *todestroy) {
-  if (todestroy->family.parent) {
-    todestroy->family.parent->family.numdead--;
-  }
-
   memory_destroy(todestroy->memory);
   free(todestroy->family.kids);
   free(todestroy->family.dead);
@@ -90,30 +86,56 @@ void process_fork(struct process *processes, struct memslab *memory) {
 
 /* process_exit terminates the process, implementing cascading termination
  */
-void process_exit(struct process *process) {
+void process_exit(struct process *processes, struct process *process) {
   if (process) {
     memory_destroy(process->memory); // immediately free fake memory
     process->memory = NULL;
-    process_remove(process);
 
     struct family *f = &(process->family);
-    while (process->family.numkids) {
-      process_exit(f->kids[f->numkids - 1]);    // request exit
-      process_destroy(f->dead[f->numdead - 1]); // TODO: use wait
+    while (f->numkids) {
+      process_exit(processes, f->kids[f->numkids - 1]); // request exit
     }
 
-    if (f->parent) { // remove from kids, add to dead
-      struct family *pf = &(f->parent->family);
-      pf->kids[f->childidx] = pf->kids[--(pf->numkids)]; // no point in shrink
+    while (f->numdead) {
+      process_wait(process);
+    }
+
+    process_remove(process);
+    struct process *parent = f->parent;
+    if (parent) { // remove from kids, add to dead
+      struct family *pf = &(parent->family);
+      size_t removepos = f->childidx;
+      pf->kids[removepos] = pf->kids[--(pf->numkids)];  // no point in shrink
+      pf->kids[removepos]->family.childidx = removepos; // fix replacement id
       pf->dead = realloc(pf->dead, sizeof *(pf->dead) * ++(pf->numdead));
       pf->dead[pf->numdead - 1] = process;
+
+      if (pf->waiting && process_wait(parent)) {
+        process_insert(processes, parent);
+      }
+
     } else {
       process_destroy(process);
     }
   }
 }
 
-void process_wait() {}
+/* returns true if wait successful, false if still waiting
+ */
+bool process_wait(struct process *parent) {
+  if (parent) {
+    if (parent->family.numdead) {
+      process_destroy(parent->family.dead[--parent->family.numdead]);
+      parent->family.waiting = false;
+      return true;
+    }
+
+    parent->family.waiting = true;
+    process_remove(parent);
+  }
+
+  return false;
+}
 
 void process_show(const struct process *proc, const char state) {
   printf("  %6d %6ld %2c\n", proc->pid, proc->priority, state);

@@ -32,9 +32,9 @@ void execute(struct process *pcb, struct memslab *memory, struct disks *disks,
   } else if (!strcmp(cmd, "fork") && expect_numargs(to_run, 0)) {
     process_fork(pcb, memory);
   } else if (!strcmp(cmd, "exit") && expect_numargs(to_run, 0)) {
-    process_exit(pcb->next);
+    process_exit(pcb, pcb->next);
   } else if (!strcmp(cmd, "wait") && expect_numargs(to_run, 0)) {
-    process_wait();
+    process_wait(pcb->next);
   } else if (!strcmp(cmd, "d") && expect_numargs(to_run, 2)) {
     long int disk;
     if ((disk = parseInt((to_run->items)[1])) != -1) {
@@ -69,11 +69,11 @@ int main() {
   }
 
   // free disks
-  disks_destroy(disks);
+  disks_destroy(pcb, disks);
 
   // free processes
   while (pcb->next) {
-    process_exit(pcb->next);
+    process_exit(pcb, pcb->next);
   }
   process_destroy(pcb);
 

@@ -9,7 +9,7 @@ struct disks {
 };
 
 struct disks *disks_create(const size_t);
-void disks_destroy(struct disks *);
+void disks_destroy(struct process *, struct disks *);
 
 void disk_request(struct process *, struct disks *, const long int,
                   const char *);
