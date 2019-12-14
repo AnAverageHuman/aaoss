@@ -55,12 +55,18 @@ void execute(struct process *pcb, struct memslab *memory, struct disks *disks,
 int main() {
   char *input;
   struct process *pcb = process_create();
-  size_t numdisks = 10;
-  struct disks *disks = disks_create(numdisks); // TODO: ask for value
-  size_t memsize = 100000;
-  struct memslab *memory = memory_create(memsize); // TODO: ask for value
 
-  while ((input = get_input())) {
+  input = get_input("How much memory:");
+  size_t memsize = parseInt(input);
+  free(input);
+  struct memslab *memory = memory_create(memsize);
+
+  input = get_input("How many hard disks:");
+  size_t numdisks = parseInt(input);
+  free(input);
+  struct disks *disks = disks_create(numdisks);
+
+  while ((input = get_input(">>"))) {
     struct command to_run = tokenize(input);
     execute(pcb, memory, disks, &to_run);
 

@@ -13,8 +13,7 @@ struct command {
   bool checked;
 };
 
-void print_prompt(void);
-char *get_input(void);
+char *get_input(const char *prompt);
 struct command tokenize(char *string);
 
 bool expect_numargs(struct command *, const size_t);
