@@ -8,8 +8,8 @@ static void show_die(const char *op) {
 }
 
 static void show_processes(const struct process *pcb) {
+  printf("  %6s %6s %2c\n", "PID", "PR", 'S');
   if (pcb->next) {
-    printf("  %6s %6s %2c\n", "PID", "PR", 'S');
     process_show(pcb->next, 'R');
 
     for (struct process *it = pcb->next->next; it; it = it->next) {
@@ -19,8 +19,8 @@ static void show_processes(const struct process *pcb) {
 }
 
 static void show_memory(const struct memslab *memory) {
+  printf("  %11s %11s %6s\n", "MSTART", "MEND", "PID");
   if (memory) {
-    printf("  %11s %11s %6s\n", "MSTART", "MEND", "PID");
     // skip first and last boundary slabs
     for (struct memslab *tmp = memory->next; tmp->next; tmp = tmp->next) {
       memory_show(tmp);
