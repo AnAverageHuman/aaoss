@@ -28,7 +28,7 @@ void disks_destroy(struct process *processes, struct disks *disks) {
   free(disks);
 }
 
-void disk_request(struct process *pcb, struct disks *disks, long int disk,
+void disk_request(struct process *pcb, struct disks *disks, const size_t disk,
                   const char *filename) {
   struct process *proc = pcb->next;
   if (!proc || disks->numdisks <= disk) {
@@ -49,7 +49,7 @@ void disk_request(struct process *pcb, struct disks *disks, long int disk,
   proc->prev = tmp;
 }
 
-void disk_done(struct process *pcb, struct disks *disks, long int disk) {
+void disk_done(struct process *pcb, struct disks *disks, size_t disk) {
   if (disks->numdisks <= disk) {
     return;
   }

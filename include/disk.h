@@ -11,9 +11,8 @@ struct disks {
 struct disks *disks_create(const size_t);
 void disks_destroy(struct process *, struct disks *);
 
-void disk_request(struct process *, struct disks *, const long int,
-                  const char *);
-void disk_done(struct process *, struct disks *, long int);
+void disk_request(struct process *, struct disks *, const size_t, const char *);
+void disk_done(struct process *, struct disks *, const size_t);
 
 void disk_show(const struct process *, const size_t);
 
