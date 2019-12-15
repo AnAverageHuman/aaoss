@@ -67,7 +67,7 @@ void process_remove(struct process *process) {
   process->next = process->prev = NULL;
 }
 
-void process_fork(struct process *processes, struct memslab *memory) {
+bool process_fork(struct process *processes, struct memslab *memory) {
   struct process *parent = processes->next;
   if (parent) {
     struct process *newproc =
@@ -80,13 +80,16 @@ void process_fork(struct process *processes, struct memslab *memory) {
       struct family *f = &(parent->family);
       f->kids = realloc(f->kids, sizeof *(f->kids) * ++(f->numkids));
       f->kids[f->numkids - 1] = newproc;
+      return true;
     }
   }
+
+  return false;
 }
 
 /* process_exit terminates the process, implementing cascading termination
  */
-void process_exit(struct process *processes, struct process *process) {
+bool process_exit(struct process *processes, struct process *process) {
   if (process) {
     memory_destroy(process->memory); // immediately free fake memory
     process->memory = NULL;
@@ -113,11 +116,14 @@ void process_exit(struct process *processes, struct process *process) {
       if (pf->waiting && process_wait(parent)) {
         process_insert(processes, parent);
       }
-
     } else {
       process_destroy(process);
     }
+
+    return true;
   }
+
+  return false;
 }
 
 /* returns true if wait successful, false if still waiting

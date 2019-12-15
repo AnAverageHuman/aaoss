@@ -36,11 +36,11 @@ void disks_destroy(struct process *processes, struct disks *disks) {
   free(disks);
 }
 
-void disk_request(struct process *pcb, struct disks *disks, const size_t disk,
+bool disk_request(struct process *pcb, struct disks *disks, const size_t disk,
                   const char *filename) {
   struct process *proc = pcb->next;
   if (!proc || disks->numdisks <= disk) {
-    return;
+    return false;
   }
   process_remove(proc);
 
@@ -55,20 +55,22 @@ void disk_request(struct process *pcb, struct disks *disks, const size_t disk,
 
   tmp->next = proc;
   proc->prev = tmp;
+  return true;
 }
 
-void disk_done(struct process *pcb, struct disks *disks, size_t disk) {
+bool disk_done(struct process *pcb, struct disks *disks, size_t disk) {
   if (disks->numdisks <= disk) {
-    return;
+    return false;
   }
 
   struct process *proc = disks->queues[disk]->next;
   if (!proc) {
-    return;
+    return false;
   }
 
   process_remove(proc);
   process_insert(pcb, proc);
+  return true;
 }
 
 void disk_show(const struct process *queue, const size_t disknum) {

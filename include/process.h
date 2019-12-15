@@ -33,8 +33,8 @@ void process_destroy(struct process *);
 void process_insert(struct process *, struct process *);
 void process_remove(struct process *);
 
-void process_fork(struct process *processes, struct memslab *);
-void process_exit(struct process *, struct process *);
+bool process_fork(struct process *processes, struct memslab *);
+bool process_exit(struct process *, struct process *);
 bool process_wait(struct process *);
 
 void process_show(const struct process *, const char);

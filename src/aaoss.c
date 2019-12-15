@@ -41,22 +41,35 @@ void execute(struct process *pcb, struct memslab *memory, struct disks *disks,
   char *cmd = (to_run->items)[0];
   if (!strcmp(cmd, "A") && expect_numargs(to_run, 2)) {
     size_t priority = parseInt(to_run->items[1], initial);
-    size_t size = parseInt((to_run->items)[2], initial);
-    process_insert(pcb, process_new(memory, priority, size));
+    size_t size = parseInt(to_run->items[2], initial);
+    struct process *newproc = process_new(memory, priority, size);
+    if (newproc) {
+      process_insert(pcb, newproc);
+    } else {
+      fprintf(stderr, "Process creation failed.\n");
+    }
   } else if (!strcmp(cmd, "fork") && expect_numargs(to_run, 0)) {
-    process_fork(pcb, memory);
+    if (!process_fork(pcb, memory)) {
+      fprintf(stderr, "Process fork failed.\n");
+    }
   } else if (!strcmp(cmd, "exit") && expect_numargs(to_run, 0)) {
-    process_exit(pcb, pcb->next);
+    if (!process_exit(pcb, pcb->next)) {
+      fprintf(stderr, "Process exit failed.\n");
+    }
   } else if (!strcmp(cmd, "wait") && expect_numargs(to_run, 0)) {
     process_wait(pcb->next);
   } else if (!strcmp(cmd, "d") && expect_numargs(to_run, 2)) {
-    size_t disk = parseInt((to_run->items)[1], initial);
-    disk_request(pcb, disks, disk, (to_run->items)[2]);
+    size_t disk = parseInt(to_run->items[1], initial);
+    if (!disk_request(pcb, disks, disk, (to_run->items)[2])) {
+      fprintf(stderr, "Disk enqueue failed.\n");
+    }
   } else if (!strcmp(cmd, "D") && expect_numargs(to_run, 1)) {
-    size_t disk = parseInt((to_run->items)[1], initial);
-    disk_done(pcb, disks, disk);
+    size_t disk = parseInt(to_run->items[1], initial);
+    if (!disk_done(pcb, disks, disk)) {
+      fprintf(stderr, "Disk dequeue failed.\n");
+    }
   } else if (!strcmp(cmd, "S") && expect_numargs(to_run, 1)) {
-    show(pcb, memory, disks, (to_run->items)[1]);
+    show(pcb, memory, disks, to_run->items[1]);
   } else if (!to_run->checked) {
     fprintf(stderr, "Command not recognized.\n");
   }

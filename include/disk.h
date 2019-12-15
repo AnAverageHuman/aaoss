@@ -1,6 +1,7 @@
 #ifndef DISK_H
 #define DISK_H
 
+#include <stdbool.h>
 #include <sys/types.h>
 
 struct disks {
@@ -11,8 +12,8 @@ struct disks {
 struct disks *disks_create(const size_t);
 void disks_destroy(struct process *, struct disks *);
 
-void disk_request(struct process *, struct disks *, const size_t, const char *);
-void disk_done(struct process *, struct disks *, const size_t);
+bool disk_request(struct process *, struct disks *, const size_t, const char *);
+bool disk_done(struct process *, struct disks *, const size_t);
 
 void disk_show(const struct process *, const size_t);
 
