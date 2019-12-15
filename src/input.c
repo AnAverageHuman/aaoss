@@ -19,7 +19,7 @@ char *get_input(const char *prompt) {
       return NULL;
     }
 
-    assert(!scanf("%*c")); // discard newline
+    scanf("%*c"); // discard newline
   }
 
   return input;

@@ -6,6 +6,10 @@
 #include "process.h"
 
 struct disks *disks_create(const size_t numdisks) {
+  if (numdisks > 100000) { // sanity check
+    return NULL;
+  }
+
   struct disks *disks = malloc(sizeof *disks);
   disks->numdisks = numdisks;
   disks->queues = malloc(numdisks * sizeof *(disks->queues));
@@ -16,6 +20,10 @@ struct disks *disks_create(const size_t numdisks) {
 }
 
 void disks_destroy(struct process *processes, struct disks *disks) {
+  if (!processes || !disks) {
+    return;
+  }
+
   for (size_t i = 0; i < disks->numdisks; i++) {
     while (disks->queues[i]->next) {
       process_exit(processes, disks->queues[i]->next);
