@@ -1,1 +1,44 @@
 An Average Operating System Simulation
+
+Building
+    $ make
+
+    For a list of all targets, try
+        $ make help
+
+    For verbose output, set the environment variable V, e.g.
+        $ make V=1
+
+Running
+    To run, use one of
+        $ ./aaoss
+    or
+        $ make run
+
+    To exit, use C-c or C-d when prompted for input.
+
+    Possible commands after initial setup are:
+        A pr mem        creates a process with priority pr and memory mem
+        fork            fork a child from currently running process
+        exit            exit running process using cascading termination
+        wait            running process consumes zombie or waits for any child
+        d disk file     currently running process uses file from disk #disk
+        D disk          disk #disk finished serving one process
+        S r             show state of the process queue
+        S i             show state of the disks
+        S m             show state of the memory
+
+    CPU scheduling :    preemptive priority scheduling
+    I/O scheduling :    first-come, first-served
+    Memory         :    worst-fit contiguous memory
+
+Fuzzing
+    This program must never segfault or leak memory.
+    To ensure this, run AFL++ [1] every commit for about 2 cycles, or 2M execs.
+    This can be done like so:
+        $ CC=afl-clang-fast make clean all
+        $ mkdir -p /tmp/afl/out
+        $ afl-fuzz -i test/fuzz -o /tmp/afl/out -t 5 -M 1 -- ./aaoss
+
+
+[1]: https://github.com/vanhauser-thc/AFLplusplus
