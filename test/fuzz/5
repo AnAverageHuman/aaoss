@@ -1,0 +1,16 @@
+100
+3
+A 5 10
+fork
+fork
+fork
+d 0 asd.txt
+exit
+exit
+d 1 qwer
+D 0
+wait
+wait
+wait
+D 1
+exit

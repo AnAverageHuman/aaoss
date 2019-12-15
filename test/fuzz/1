@@ -1,0 +1,11 @@
+200
+3
+A 2 5
+fork
+exit
+wait
+S r
+S i
+S m
+d 0 file.txt
+D 0
