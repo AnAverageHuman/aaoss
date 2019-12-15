@@ -4,10 +4,9 @@
 #include "aaoss.h"
 #include "process.h"
 
-pid_t nextpid = 1;
-
 struct process *process_new(struct memslab *memory, const long int priority,
                             const size_t size) {
+  static pid_t nextpid = 1;
   struct memslab *newmem = memory_insert(memory, size);
   if (!newmem) { // failed to allocate fake memory
     return NULL;

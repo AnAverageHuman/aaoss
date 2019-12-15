@@ -23,6 +23,4 @@ void execute(struct process *, struct memslab *, struct disks *,
 void show(const struct process *, const struct memslab *, const struct disks *,
           const char *);
 
-const static char SPACE = ' ';
-
 #endif // AAOSS_H

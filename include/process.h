@@ -6,8 +6,6 @@
 
 #include "memory.h"
 
-extern pid_t nextpid;
-
 struct family {
   struct process *parent;
   size_t childidx; // where we are in the parent children array

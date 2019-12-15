@@ -5,6 +5,7 @@
 
 #include "aaoss.h"
 
+const static char SPACE = ' ';
 
 /* prompts for and returns a line of input from stdin, excluding empty lines
  */
